@@ -10,6 +10,7 @@
 
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
   <table class="table text-left">
+    <caption class="text-2xl font-bold p-3 text-left">NWG Recurring Contracts</caption>
     <thead>
       <tr>
         <th>Contract Id</th>
@@ -31,7 +32,8 @@
         <td>{contract.currentTermStart}</td>
         <td>{contract.currentTermEnd}</td>
         <td class="text-center">
-            <a class="btn btn-ghost text-m" href="contracts/{contract.id}/schedule">Schedule</a>
+            <a class="btn outline text-s" href="contracts/{contract.id}/schedule">Schedule</a>
+            <a class="btn btn-ghost text-s" href="contracts/{contract.id}/edit">Edit</a>
         </td>
       </tr>
       {/each}
