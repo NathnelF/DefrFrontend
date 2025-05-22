@@ -66,4 +66,4 @@
 </script>
 
 <InvoiceDate />
-<Schedule events={events} />
+<Schedule events={events} contractName="Test Customer Test Service"/>
