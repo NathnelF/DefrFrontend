@@ -1,4 +1,5 @@
 <script>
+    import Flatpickr from '../../lib/components/Flatpickr.svelte';
     import Report from './Report.svelte'
     //TODO: default to events from the current month / year
     //TODO: add date picker to choose the time period for the reports generated 
@@ -62,8 +63,44 @@
         "contractId": 1,
         "amount": 0,
         "date": "2026-04-15T19:57:58.387"
-      }
+      },
+      {
+        "contractId": 1,
+        "amount": 0,
+        "date": "2026-03-15T19:57:58.387"
+      },
+      {
+        "contractId": 1,
+        "amount": 0,
+        "date": "2026-04-15T19:57:58.387"
+      },
+      {
+        "contractId": 1,
+        "amount": 0,
+        "date": "2026-03-15T19:57:58.387"
+      },
+      {
+        "contractId": 1,
+        "amount": 0,
+        "date": "2026-04-15T19:57:58.387"
+      },
+      {
+        "contractId": 1,
+        "amount": 0,
+        "date": "2026-03-15T19:57:58.387"
+      },
+      {
+        "contractId": 1,
+        "amount": 0,
+        "date": "2026-04-15T19:57:58.387"
+      },
     ];
+
 </script>
+
+<div class="flex items-center mb-4">
+  <Flatpickr id={"start-date"} label="From" />
+  <Flatpickr id={"end-date"} label="To" />
+</div>
 
 <Report events={events} />
