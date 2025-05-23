@@ -4,8 +4,15 @@
 
     //TODO: grab the contract info from the server
 
-    export let data;
-    let testContract = data.contract;
+    let { data } = $props();
+    let { found, contract, error} = data;
 </script>
 
-<EditForm testContract={testContract}/>
+
+{#if error}
+<p class="text-2xl font-bold p-3 text-left">Can't load data. Check database conenction.</p>
+{:else if !contract}
+<p>No info for contract??</p>
+{:else}
+<EditForm contract={contract}/>
+{/if}

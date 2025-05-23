@@ -5,18 +5,46 @@
 //TODO: Function to get updated customer / service id from updated names.
 //TODO: Function to send updated contract info to DB
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-let testContract = {
-        customerName: "Test Customer",
-        serviceName: "Test Service",
-        price: 1000,
-        currentTermStart: "2024-05-20T17:31:16.333",
-        ccurrentTermEnd: "2025-05-19T17:31:16.333"
-};
+//going to edit get contract to also return names.
 
-export const load = () => {
-    return { contract: testContract };
-};
+export async function load({ fetch, params}){
+    const contractId = params.id;
+    console.log(`id: ${contractId}`)
+    try{
+        const res = await fetch(`https://localhost:7246/contractInfo?contractId=${contractId}`)
+        if (!res.ok){
+            throw new Error(`Error status: ${res.status}`);
+        }
+        const info = await res.json()
+        if (!info || info.length === 0){
+            return {
+                found: false,
+                contract: null,
+                error: null
+            }
+
+        }
+        return {
+            found: true,
+            contract: info,
+            error: null
+        };
+
+    } catch (error) {
+        console.log(`error: ${error.message}`)
+        return {
+            found: false,
+            contract: null,
+            error: error.message
+        };
+    }
+
+
+
+
+}
 
 
 export const actions = {
