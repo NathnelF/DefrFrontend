@@ -5,7 +5,7 @@
 
     let { id, label } = $props();
     let fp = undefined;
-    console.log("initalized variables");
+    //console.log("initalized variables");
     
     onMount( () => {
         fp = flatpickr(`#${id}`, {
@@ -17,14 +17,14 @@
             return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
     }
     });
-    console.log("fp mounted");
+    //console.log("fp mounted");
     return () => {
         fp.destroy();
-        console.log("fp unmounted")
+        //console.log("fp unmounted")
     }
 
     }); 
-    console.log("moving on")
+    //console.log("moving on")
     
     
 </script>
