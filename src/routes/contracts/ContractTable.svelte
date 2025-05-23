@@ -1,5 +1,6 @@
 <script>
     let {contracts, names} = $props();
+    import { convertDate } from '../../lib/utils/dateConverter.js'
 
     //TODO: await contracts and render them if they exist
 
@@ -29,8 +30,8 @@
         <td>{names.customerName}</td>
         <td>{names.serviceName}</td>
         <td>{contract.price}</td>
-        <td>{contract.currentTermStart}</td>
-        <td>{contract.currentTermEnd}</td>
+        <td>{convertDate(contract.currentTermStart)}</td>
+        <td>{convertDate(contract.currentTermEnd)}</td>
         <td class="text-center">
             <a class="btn outline text-s" href="contracts/{contract.id}/schedule">Schedule</a>
             <a class="btn btn-ghost text-s" href="contracts/{contract.id}/edit">Edit</a>

@@ -15,7 +15,7 @@
       {#each events as event}
       <tr>
         <td>{event.date}</td>
-        <td>{event.amount}</td>
+        <td>{event.amount.toFixed(2)}</td>
       </tr>
       {/each}
     </tbody>
