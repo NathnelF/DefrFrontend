@@ -6,10 +6,24 @@ export async function load({ fetch }) {
         const res = await fetch('http://localhost:5025/contracts')
         if (!res.ok){
             console.log(res.status)
-            throw new Error(`Response status ${res.status}`)
+            return {
+                error: res.status,
+                contracts: []
+            }
         }
-        const contracts = await res.json()
-        return { contracts }
+        const data = await res.json()
+        if (!data || data.length === 0){
+            return {
+                error: null,
+                contracts: []
+            }
+        }
+        else{
+            return {
+                error: null,
+                contracts: data
+            }
+        }
 
     } catch (error) {
         console.log(error.message)

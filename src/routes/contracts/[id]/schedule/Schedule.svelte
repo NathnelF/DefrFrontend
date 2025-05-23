@@ -1,11 +1,5 @@
 <script>
     let { events, contractName } = $props(); 
-
-    //TODO: await props from get request.
-
-    //TODO: check if they exist.
-      //TODO: if they do render them.
-      //TODO: if they don't generate them.
 </script>
 
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">

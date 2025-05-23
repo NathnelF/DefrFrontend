@@ -66,7 +66,7 @@
 
 
 {#if error}
-<span>Error!! {error}</span>
+<p class="text-2xl font-bold p-3 text-left">Can't load data. Check database conenction.</p>
 {:else if !found || events.length === 0}
 <span>No schedule for contract: {id}</span>
 <button class='btn' onclick={generateSchedule}>Generate Schedule</button>
