@@ -125,7 +125,8 @@ export const actions = {
             price: data.get('price'),
             currentTermStart: IsoStart,
             currentTermEnd: IsoEnd,
-            termLength: data.get('termLength')
+            termLength: data.get('termLength'),
+            originalContractStart: data.get("originalContractStart"),
 
         };
 

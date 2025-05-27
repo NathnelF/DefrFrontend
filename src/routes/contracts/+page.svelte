@@ -17,3 +17,4 @@
 {:else}
 <ContractTable contracts={contracts} names={names} />
 {/if}
+<a class="btn" href="/contracts/create">Create Contract</a>
