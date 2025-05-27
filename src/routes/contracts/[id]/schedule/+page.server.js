@@ -1,6 +1,5 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 export async function load({ fetch, params }){
-
     const contractId = params.id;
     try{
         const res = await fetch(`https://localhost:7246/schedules?contractId=${contractId}`)
