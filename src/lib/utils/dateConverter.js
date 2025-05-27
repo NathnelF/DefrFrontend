@@ -13,7 +13,8 @@ export function IsoDate(date) {
     //parses date string into ISO format to be sent to server.
     const newDate = new Date(date);
     if (isNaN(newDate)) {
-        throw new Error('Invalid date format!, please use: Month day, Year')
+        console.log("Error in date format")
+        throw new Error('Invalid date format!')
     }
 
     const IsoDate = newDate.toISOString().slice(0,19);

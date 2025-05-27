@@ -1,5 +1,5 @@
 <script>
-
+    let { data, form } = $props();
 </script>
 
 
@@ -51,3 +51,6 @@
     <button type="submit">Save</button>
 </form>
 
+{#if form?.error}
+<p>{form?.error}</p>
+{/if}

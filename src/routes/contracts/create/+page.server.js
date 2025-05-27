@@ -17,10 +17,10 @@ export const actions = {
             IsoOriginal = IsoDate(data.get("originalContractStart"))
             console.log("Test2")
 
-        } catch (error) {
+        } catch (dateError) {
             return {
                 success: false,
-                error: error
+                error: dateError.message
             }
         }
         console.log("test3")
