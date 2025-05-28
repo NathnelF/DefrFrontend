@@ -3,7 +3,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 export async function load({ fetch }) {
 
     try{
-        const res = await fetch('http://localhost:5025/contracts')
+        const res = await fetch('/contracts')
         if (!res.ok){
             console.log(res.status)
             return {
