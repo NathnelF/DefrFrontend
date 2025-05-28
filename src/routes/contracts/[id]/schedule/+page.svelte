@@ -2,14 +2,22 @@
     import InvoiceDate from './InvoiceDate.svelte';
     import Schedule from './Schedule.svelte'
     import { page } from '$app/stores'
+    import Flatpickr from "$lib/components/Flatpickr.svelte";
 
     let { data } = $props();
     let { error} = data;
     let found = $state(data.found)
     let events = $state(data.events)
-    let genError = ''
-    let delError = ''
+    let invoiceDate = $state(data.date)
+    let genError = null
+    let delError = null
+    let updateInvoiceError = null
     const id = $page.params.id;
+    console.log(`invoice Date for contract ${id}: ${invoiceDate}`)
+    let dateExists = $state(false)
+    if (invoiceDate != null){
+        dateExists = true
+    }
 
 
     async function generateSchedule(){
@@ -55,9 +63,44 @@
         }
 
       } catch (error) {
-        delError = "Could reach endpoint (clear_schedule)"
+        delError = "Could not reach endpoint (clear_schedule)"
       }
     }
+
+    async function updateInvoiceDate() {
+      try {
+        console.log("attempt to update invoice date:", invoiceDate);
+
+        const res = await fetch(`https://localhost:7246/update_invoice_date?contractId=${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            invoiceDate: invoiceDate
+          })
+        });
+
+        if (!res.ok) {
+          updateInvoiceError = await res.json();
+          console.log(updateInvoiceError);
+          return;
+        }
+
+        const info = await res.json()
+        console.log("Response body:", info);
+
+        if (info && info.invoiceDate) {
+          invoiceDate = info.invoiceDate;
+          console.log("Invoice date updated to:", invoiceDate);
+        }
+
+      } catch (error) {
+        updateInvoiceError = `Could not reach endpoint: ${error.message}`;
+        console.log(updateInvoiceError);
+      }
+    }
+
 
 
 
@@ -71,7 +114,14 @@
 <span>No schedule for contract: {id}</span>
 <button class='btn' onclick={generateSchedule}>Generate Schedule</button>
 {:else}
-<InvoiceDate />
+<div class="flex items-center">
+<Flatpickr id={"invoice-date"} label="Invoice Date" bind:value={invoiceDate} />
+{#if !dateExists}
+<button class="btn mt-6 ml-4">New Date</button>
+{:else}
+<button class="btn mt-6 ml-4" onclick={updateInvoiceDate}>Update Date</button>
+{/if}
+</div>
 <button class='btn' onclick={clearSchedule}>Clear Schedule</button>
 <Schedule events={events} contractName="Test Customer Test Service"/>
 {/if}

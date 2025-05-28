@@ -1,35 +1,40 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-export async function load({ fetch, params }){
+export async function load({ fetch, params}){
     const contractId = params.id;
-    try{
-        const res = await fetch(`https://localhost:7246/schedules?contractId=${contractId}`)
-        if (!res.ok){
-            throw new Error(`Error status: ${res.status}`);
-        }
-        const schedule = await res.json()
-        if (!schedule || schedule.length === 0){
-            return {
-                found: false,
-                events: [],
-                error: null
-            }
 
-        }
-        return {
-            found: true,
-            events: schedule,
-            error: null
-        };
+    const scheduleUrl = `https://localhost:7246/schedules?contractId=${contractId}`;
+    const invoiceDateUrl = `https://localhost:7246/invoiceDate?contractId=${contractId}`;
 
-    } catch (error) {
-        return {
-            found: false,
-            events: [],
-            error: error.message
-        };
+    const [scheduleRes, invoiceDateRes] = await Promise.all([
+        fetch(scheduleUrl),
+        fetch(invoiceDateUrl)
+    ]);
+
+    let schedule = [];
+    let date = null
+    let found = false;
+    let error = null;
+
+    if (!scheduleRes.ok){
+        error = await scheduleRes.text();
+    } else{ 
+        schedule = await scheduleRes.json();
+        if (schedule && schedule.length > 0) {
+            found = true;
+        }
     }
 
+    if (!invoiceDateRes.ok){
+        error = await invoiceDateRes.text();
+    } else{
+        const invoiceData = await invoiceDateRes.json();
+        date = invoiceData.invoiceDate;
+    }
 
+    return {
+        found,
+        events: schedule,
+        date,
+        error
+    };
 
 }
-
