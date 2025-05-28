@@ -16,7 +16,7 @@
 
     <label class="my-2">
         Annual Amount:
-        <input name="price" class="pl-1" placeholder="Annual amount" required value="1560"/>
+        <input name="price" class="pl-1" placeholder="Annual amount" type="number" required value="1560"/>
     </label>
 
     <label class="my-2">
@@ -36,7 +36,7 @@
 
     <label class="my-2">
         Term Length:
-        <input name="termLength" class="pl-1 w-[500px]" placeholder="Term length in months"  required value="12"/>
+        <input name="termLength" class="pl-1 w-[500px]" placeholder="Term length in months"  required type="number" value="12"/>
     </label>
 
     <!-- <label class="my-2">

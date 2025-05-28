@@ -1,6 +1,5 @@
 <script>
     let { contract, form } = $props();
-    import { enhance } from '$app/forms';
     import { readableDate } from '../../../../lib/utils/dateConverter.js'
 
 </script>

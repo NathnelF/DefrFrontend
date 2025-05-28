@@ -2,11 +2,11 @@
     let {contracts, names} = $props();
     import { readableDate } from '../../lib/utils/dateConverter.js'
 
-    //TODO: await contracts and render them if they exist
 
     //If they don't direct to new contract page.
+    async function deleteContract(contractId) {
 
-    //TODO: add edit contract page
+    }
 </script>
 
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
@@ -35,6 +35,7 @@
         <td class="text-center">
             <a class="btn outline text-s" href="contracts/{contract.id}/schedule">Schedule</a>
             <a class="btn btn-ghost text-s" href="contracts/{contract.id}/edit">Edit</a>
+            <button class="btn" onclick={deleteContract}>Delete</button>
         </td>
       </tr>
       {/each}
