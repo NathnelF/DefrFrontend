@@ -13,12 +13,7 @@
     let delError = null
     let updateInvoiceError = null
     const id = $page.params.id;
-    console.log(`invoice Date for contract ${id}: ${invoiceDate}`)
-    let dateExists = $state(false)
-    if (invoiceDate != null){
-        dateExists = true
-    }
-
+    let dateExists = data.date
 
     async function generateSchedule(){
       try {
