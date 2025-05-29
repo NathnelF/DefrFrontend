@@ -1,5 +1,6 @@
 <script> 
     let { events } = $props();
+    import { readableDate } from "$lib/utils/dateConverter";
 </script>
 
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
@@ -15,7 +16,7 @@
     <tbody>
       {#each events as event}
       <tr>
-        <td>{event.date}</td>
+        <td>{readableDate(event.date)}</td>
         <td>{event.contractId}</td>
         <td>{event.amount}</td>
       </tr>
