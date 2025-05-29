@@ -5,15 +5,18 @@
     import Flatpickr from "$lib/components/Flatpickr.svelte";
 
     let { data } = $props();
-    let { error} = data;
+    let { error } = data;
     let found = $state(data.found)
     let events = $state(data.events)
     let invoiceDate = $state(data.date)
     let genError = null
     let delError = null
     let updateInvoiceError = null
+    let dateInfo
+    let amountInfo
     const id = $page.params.id;
-    let dateExists = data.date
+    const dateExists = data.date
+    let reloadLink;
 
     async function generateSchedule(){
       try {
@@ -88,6 +91,7 @@
         if (info && info.invoiceDate) {
           invoiceDate = info.invoiceDate;
           console.log("Invoice date updated to:", invoiceDate);
+
         }
 
       } catch (error) {
@@ -95,6 +99,91 @@
         console.log(updateInvoiceError);
       }
     }
+
+    async function testUpdate(){
+      const dateUrl = `https://localhost:7246/update_invoice_date?contractId=${id}`
+      const amountUrl = `https://localhost:7246/update_schedule_invoice_amount?Id=${id}`
+
+      
+      const dateRes = await fetch(dateUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          invoiceDate: invoiceDate
+      })
+      })
+
+      if (!dateRes.ok){
+        updateInvoiceError = await dateRes.text()
+        console.log(`failed on date update: ${updateInvoiceError}`)
+        return updateInvoiceError
+
+      } else {
+        dateInfo = await dateRes.json()
+        console.log(`successful date update: ${dateInfo}`)
+      }
+
+      const amountRes = await fetch(amountUrl, {
+        method: 'PUT'
+      })
+
+      if (!amountRes.ok){
+        updateInvoiceError = await amountRes.text()
+        console.log(`failed on amount update: ${updateInvoiceError}`)
+        return updateInvoiceError
+
+      } else {
+        amountInfo = await amountRes.json()
+        console.log(`successful amount update: ${amountInfo}`)
+        reloadLink.click()
+        return amountInfo
+      }
+    }
+
+    async function testTestupdate(){
+      try{
+        const amountUrl = `https://localhost:7246/update_schedule_invoice_amount?Id=${id}`
+        const res = await fetch(amountUrl, {
+          method: 'PUT'
+        })
+
+        if (!res.ok){
+          console.log(`error on endpoint ${res.status}`)
+        } else{
+          const info = await res.json()
+          console.log(`success on endpoint`
+          )
+          reloadLink.click()
+          return;
+        }
+
+        
+      } catch (error)
+      {
+        console.log(`error on update invoice ${error.message}`)
+      }
+      
+    }
+
+    async function clearInvoiceDate(){
+      try{
+        const res = await fetch(`https://localhost:7246/reset_invoice_date?contractId=${id}`, {
+          method: 'PUT'
+        })
+        if (!res.ok) {
+          console.log('could not reset invocie date')
+        } else{
+          console.log('reset invoice date')
+          invoiceDate = null
+          reloadLink.click()
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
 
 
 
@@ -112,13 +201,15 @@
 <div class="flex items-center">
 <Flatpickr id={"invoice-date"} label="Invoice Date" bind:value={invoiceDate} />
 {#if !dateExists}
-<button class="btn mt-6 ml-4">New Date</button>
+<button class="btn mt-6 ml-4" onclick={testUpdate}>New Date</button>
 {:else}
 <button class="btn mt-6 ml-4" onclick={updateInvoiceDate}>Update Date</button>
 {/if}
 </div>
 <button class='btn' onclick={clearSchedule}>Clear Schedule</button>
+<button class='btn' onclick={testTestupdate}>Update Invoice Amount</button>
+<button class='btn' onclick={clearInvoiceDate}>Clear Invoice Date</button>
 <Schedule events={events} contractName="Test Customer Test Service"/>
 {/if}
-
+<a href="/contracts/{id}/schedule"  data-sveltekit-reload class="hidden" bind:this={reloadLink}>Reload</a>
 
