@@ -17,7 +17,7 @@
       {#each events as event}
       <tr>
         <td>{readableDate(event.date)}</td>
-        <td>{event.contractId}</td>
+        <td>{event.customerInfo}</td>
         <td>{event.amount}</td>
       </tr>
       {/each}

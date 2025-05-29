@@ -2,7 +2,7 @@ export async function load({ fetch, params}){
     const contractId = params.id;
 
     const scheduleUrl = `https://localhost:7246/schedules?contractId=${contractId}`;
-    const invoiceDateUrl = `https://localhost:7246/invoiceDate?contractId=${contractId}`;
+    const invoiceDateUrl = `https://localhost:7246/invoice_date?contractId=${contractId}`;
 
     const [scheduleRes, invoiceDateRes] = await Promise.all([
         fetch(scheduleUrl),

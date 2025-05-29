@@ -55,6 +55,6 @@
 {:else if found === false}
 <p>Click Events to load Events in specified range</p>
 {:else}
-<Report {events} />
+<Report bind:events={events} />
 {/if}
 
