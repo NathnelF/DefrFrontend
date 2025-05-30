@@ -100,7 +100,7 @@
       }
     }
 
-    async function testUpdate(){
+    async function newDateUpdateAmount(){
       const dateUrl = `https://localhost:7246/update_invoice_date?contractId=${id}`
       const amountUrl = `https://localhost:7246/update_schedule_invoice_amount?Id=${id}`
 
@@ -142,7 +142,7 @@
       }
     }
 
-    async function testTestupdate(){
+    async function updateAmount(){
       try{
         const amountUrl = `https://localhost:7246/update_schedule_invoice_amount?Id=${id}`
         const res = await fetch(amountUrl, {
@@ -201,13 +201,13 @@
 <div class="flex items-center">
 <Flatpickr id={"invoice-date"} label="Invoice Date" bind:value={invoiceDate} />
 {#if !dateExists}
-<button class="btn mt-6 ml-4" onclick={testUpdate}>New Date</button>
+<button class="btn mt-6 ml-4" onclick={newDateUpdateAmount}>New Date</button>
 {:else}
 <button class="btn mt-6 ml-4" onclick={updateInvoiceDate}>Update Date</button>
 {/if}
 </div>
 <button class='btn' onclick={clearSchedule}>Clear Schedule</button>
-<button class='btn' onclick={testTestupdate}>Update Invoice Amount</button>
+<button class='btn' onclick={updateAmount}>Update Invoice Amount</button>
 <button class='btn' onclick={clearInvoiceDate}>Clear Invoice Date</button>
 <Schedule events={events} contractName="Test Customer Test Service"/>
 {/if}

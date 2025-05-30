@@ -54,7 +54,7 @@
         <th>{contract.id}</th>
         <td>{names.customerName}</td>
         <td>{names.serviceName}</td>
-        <td>{contract.price}</td>
+        <td>{`${contract.price.toFixed(2)}`}</td>
         <td>{readableDate(contract.currentTermStart)}</td>
         <td>{readableDate(contract.currentTermEnd)}</td>
         <td class="text-center">

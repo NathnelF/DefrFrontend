@@ -18,7 +18,7 @@
       <tr>
         <td>{readableDate(event.date)}</td>
         <td>{event.customerInfo}</td>
-        <td>{event.amount}</td>
+        <td>{event.amount.toFixed(2)}</td>
       </tr>
       {/each}
     </tbody>
