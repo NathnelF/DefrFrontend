@@ -5,7 +5,6 @@
 
     let { id, label, value=$bindable() } = $props();
     let fp = undefined;
-    console.log(`flatpickr value" ${value}`);
     
     onMount( () => {
         fp = flatpickr(`#${id}`, {
