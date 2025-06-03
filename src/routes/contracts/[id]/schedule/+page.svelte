@@ -207,7 +207,7 @@
 {/if}
 </div>
 <button class='btn' onclick={clearSchedule}>Clear Schedule</button>
-<button class='btn' onclick={updateAmount}>Update Invoice Amount</button>
+<button class='btn' onclick={updateAmount }>Update Invoice Amount</button>
 <button class='btn' onclick={clearInvoiceDate}>Clear Invoice Date</button>
 <Schedule events={events} contractName="Test Customer Test Service"/>
 {/if}

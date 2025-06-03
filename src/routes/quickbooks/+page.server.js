@@ -8,6 +8,7 @@ export const actions = {
         if (file && typeof file !== "string"){
             try { 
                 const csvData = await file.text()
+                
                 //send the text to api endpoint!
                 if (!csvData || csvData.length === 0) {
                     console.log(`csv is empty`)
@@ -17,6 +18,7 @@ export const actions = {
                         result: null
                     }
                 }
+                console.log(`${csvData.substring(0, 20)}`)
                 const url = "https://localhost:7246/post_qb_events"
                 try{
                     const res = await fetch(url, {
