@@ -8,6 +8,8 @@
     let startDate = $state(firstDayOfYear.toLocaleDateString('en-CA'));
     let endDate = $state(currentDay.toLocaleDateString('en-CA'));
     let file
+
+    let { form } = $props()
 </script>
 
 <div class="flex items-center">
@@ -25,6 +27,14 @@
             <button type="submit" class="btn w-26.75 mt-2">Upload</button>
         </form> 
 </div>
+
+{#if form?.error}
+<p>{form?.error}</p>
+{:else if form?.success === false}
+<p>Did not succeed: {form?.error}</p>
+{:else}
+<p>Did succeed! {form?.result}</p>
+{/if}
 
 
 
