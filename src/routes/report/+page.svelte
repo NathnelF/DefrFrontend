@@ -1,12 +1,8 @@
 <script>
     import Flatpickr from '../../lib/components/Flatpickr.svelte';
     import Report from './Report.svelte'
-    //TODO: default to events from the current month / year
-    //TODO: add date picker to choose the time period for the reports generated 
     let currentDay = new Date();
-    console.log(currentDay)
     let firstDayOfYear = new Date(currentDay.getFullYear(), 0, 1);
-    console.log(firstDayOfYear)
 
     let startDate = $state(firstDayOfYear.toLocaleDateString('en-CA'))
     let endDate = $state(currentDay.toLocaleDateString('en-CA'))
