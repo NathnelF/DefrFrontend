@@ -68,12 +68,8 @@
 <p>Error getting quickbooks events {qbError}</p>
 {:else if nwgError}
 <p>Error getting NWG events {nwgError}</p>
-{:else if nwgEvents.length > 0 && qbEvents.length > 0 && found === true}
-<CompareReport {nwgEvents} {qbEvents} />
 {:else if found === true}
-<p>Number of NWG events found for this date range {nwgEvents.length}</p>
-<p>Number of QB events found for this date range {qbEvents.length}</p>
-<p>Must find a range with both events for table to show</p>
+<CompareReport {nwgEvents} {qbEvents} />
 {:else}
 <p>Select a range of dates and click Get Events to search for all recognition events in that range.</p>
 {/if}

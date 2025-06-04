@@ -15,7 +15,7 @@ export async function load({ fetch, params}){
     const contractId = params.id;
     console.log(`id: ${contractId}`)
     try{
-        const res = await fetch(`https://localhost:7246/contractInfo?contractId=${contractId}`)
+        const res = await fetch(`https://localhost:7246/contract_info?contractId=${contractId}`)
         if (!res.ok){
             throw new Error(`Error status: ${res.status}`);
         }
