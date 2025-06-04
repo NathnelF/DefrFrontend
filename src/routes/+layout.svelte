@@ -9,6 +9,7 @@
 	<a class="btn btn-ghost text-xl" href="/contracts">Contracts</a>
 	<a class="btn btn-ghost text-xl" href="/report">Report</a>
 	<a class="btn btn-ghost text-xl" href="/quickbooks">Quickbooks</a>
+	<a class="btn btn-ghost text-xl" href="/quickbooks">Compare</a>
 </div>
 
 

@@ -15,7 +15,7 @@
     let clearError = $state(null)
     let found = $state(false)
     let events = $state([])
-    let uploading = $state(false)
+    let showFormMessage = $state(true)
 
 
     async function getEventsByDate(){
@@ -35,6 +35,7 @@
         loadError = error.message
         console.log(`Cound't fetch events ${loadError}`)
      }
+     showFormMessage = false;
      
      return (
         loadError,
@@ -46,33 +47,32 @@
     function clearEvents(){
         found = false;
         events = []
+        showFormMessage = false;
     }
 
     async function resetAllEvents(){
      try{
-        uploading = true
         const res = await fetch("https://localhost:7246/clear_qb_events", {
             method: 'DELETE'
         })
         if (!res.ok) {
             clearError = await res.text()
             console.log(`Error resetting events ${clearError}`)
-            uploading = false
         }
         else{
-            uploading = false
             events = []
             found = false
             clearError = null
             loadError = null
         }
      } catch (error) {
-        uploading = false
+
         clearError = error.message
         console.log(`Error resetting events ${clearError}`)
      }
+
+     showFormMessage = false;
      
-     uploading = false
      return (
         events,
         found,
@@ -82,7 +82,6 @@
 </script>
 
 
-{#if uploading === false}
 <div class="flex items-center">
         <Flatpickr id={"start-date"} label="From" bind:value={startDate}/>
         <Flatpickr id={"end-date"} label="To" bind:value={endDate}/>
@@ -104,8 +103,10 @@
         {/if}
         {#if form?.error}
         <p>{form?.error}</p>
-        {:else if form?.success === false}
+        {:else if form?.success === false && showFormMessage === true}
         <p>Form submit did not succeed: {form?.error}</p>
+        {:else if form?.success === true && showFormMessage === true}
+        <p>Success: {form?.result}</p>
         {/if} 
 </div>
 
@@ -122,9 +123,6 @@
 <p>Error reseting events {clearError}</p>
 {/if}
 </div>
-{:else}
-<p>Uploading csv please wait :D</p>
-{/if}
     
 
 
