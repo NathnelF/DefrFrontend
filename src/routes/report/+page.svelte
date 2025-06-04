@@ -42,12 +42,18 @@
       )
     }
 
+    function clearEvents(){
+      events = []
+      found = false
+    }
+
 </script>
 
 <div class="flex items-center mb-4">
   <Flatpickr id={"start-date"} label="From" bind:value={startDate}/>
   <Flatpickr id={"end-date"} label="To" bind:value={endDate}/>
   <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={loadEventsByDate}>Events</button>
+  <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={clearEvents}>Clear Events</button>
 </div>
 
 {#if loadError}
