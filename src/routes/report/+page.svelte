@@ -13,6 +13,7 @@
 
     async function loadEventsByDate(){
       const url = `https://localhost:7246/report_events?startDate=${startDate}&endDate=${endDate}`
+      loadError = null
       try {
         console.log('attempting to load events')
         const res = await fetch(url)
@@ -41,6 +42,7 @@
     function clearEvents(){
       events = []
       found = false
+      loadError = null
     }
 
 </script>

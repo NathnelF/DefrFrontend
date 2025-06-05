@@ -20,6 +20,7 @@
 
     async function getEventsByDate(){
      const url = `https://localhost:7246/get_qb_event_range?startDate=${startDate}&endDate=${endDate}`
+     loadError = null
      try{
         const res = await fetch(url)
         if (!res.ok) {
@@ -48,6 +49,7 @@
         found = false;
         events = []
         showFormMessage = false;
+        loadError = null
     }
 
     async function resetAllEvents(){
@@ -111,10 +113,10 @@
 </div>
 
 <div>
-{#if found == false}
-<p>Try generating events</p>
-{:else if loadError}
+{#if loadError}
 <p>Error generating events: {loadError}</p>
+{:else if found === false}
+<p>Try generating events</p>
 {:else if events.length === 0}
 <p>Could not find events for that range</p>
 {:else if events && events.length > 0 && !clearError}

@@ -2,6 +2,7 @@
     import CompareReport from "./CompareReport.svelte"
     import Flatpickr from "$lib/components/Flatpickr.svelte";
     import { disableScrollHandling } from "$app/navigation";
+    import { readableDate } from "$lib/utils/dateConverter";
     let currentDay = new Date();
     let firstDayOfYear = new Date(currentDay.getFullYear(), 0, 1);
 
@@ -58,6 +59,7 @@
         nwgEvents = []
         qbEvents = []
         nwgCustomers = new Map()
+        qbCustomers = new Map()
         qbError =null
         nwgError = null
         found = false
@@ -119,12 +121,10 @@
         qbCustomers = new Map()
         qbEvents.forEach((event) => {
             if (!event.isInvoice){
-                //console.log(event.lineDescription)
                 let split = event.lineDescription.split(" ")
-                //console.log(split)
                 if (split.length === 1){
                     let name = "GT" //hard coded at GT for now because this is the only customer that follows this pattern in Quickbooks
-                    let count = qbCustomers.get(name) || 0 //get's count or set to zero if can't be found
+                    let count = qbCustomers.get(name) || 0
                     count++
                     qbCustomers.set(name, count)
                 }
@@ -163,7 +163,7 @@
         countModal.showModal()
     }
 
-    function close(){
+    function close(){   
         countModal.close()
     }
 </script>
@@ -176,7 +176,8 @@
   <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={clearEvents}>Clear Events</button>
   <dialog class="modal" bind:this={countModal}>
     <div class="modal-box w-11/12 max-w-5xl">
-        <h3 class="text-lg font-bold">Entry Counts</h3>
+        <h3 class="text-lg font-bold">Entry Counts:</h3>
+        <h3>{readableDate(startDate)} -- {readableDate(endDate)}</h3>
         <p class="py-4">Press Escape or Click the button below to close</p>
         <div class="flex w-full">
             {#if nwgCustomers.size > 0}
