@@ -13,6 +13,8 @@
     let qbError = $state(null)
     let found = $state(false)
     let countModal = $state(null)
+    let nwgCustomers = $state(new Map())
+    let qbCustomers = $state(new Map())
 
     async function fetchEvents(){
         const qbUrl = `https://localhost:7246/get_qb_event_range?startDate=${startDate}&endDate=${endDate}`
@@ -28,7 +30,6 @@
             console.log(`qbError: ${qbError}`)
         } else{
             qbEvents = await qbRes.json()
-            console.log(`${qbEvents[0]}`)
         }
 
         if (!nwgRes.ok) {
@@ -36,8 +37,9 @@
             console.log(`nwgError: ${nwgError}`)
         } else{
             nwgEvents = await nwgRes.json()
+            countNwgCustomers()
+            countQbCustomers()
             found = true
-            console.log(`${nwgEvents[0]}`)
         }
 
         return (
@@ -52,9 +54,106 @@
     function clearEvents(){
         nwgEvents = []
         qbEvents = []
+        nwgCustomers = new Map()
         qbError =null
         nwgError = null
         found = false
+    }
+
+    
+
+    function countNwgCustomers(){
+        nwgCustomers = new Map();
+        nwgEvents.forEach((event) => {
+            if (event.amount > 0){
+                let split = event.customerInfo.split(" ")
+                if (split.length > 2){
+                    if (split[1] === 'NWG' || split[1] === 'VMP' || split[1] === 'EH'){
+                        let name = `(Invoice for: ${split[0]})`
+                        let count = nwgCustomers.get(name) || 0
+                        count++
+                        nwgCustomers.set(name, count)
+                    } else {
+                        let name = `(Invoice for: ${split[0]} ${split[1]})`
+                        let count = nwgCustomers.get(name) || 0
+                        count++
+                        nwgCustomers.set(name, count)
+                    }
+                }
+                else{
+                    let name = `(Invoice for: ${split[0]})`
+                    let count = nwgCustomers.get(name) || 0
+                    count++
+                    nwgCustomers.set(name, count)
+                }
+            } 
+            else {
+                let split = event.customerInfo.split(" ")
+                if (split.length > 2){
+                    if (split[1] === 'NWG' || split[1] === 'VMP' || split[1] === 'EH'){
+                        let name = split[0]
+                        let count = nwgCustomers.get(name) || 0
+                        count++
+                        nwgCustomers.set(name, count)
+                    } else {
+                        let name = `${split[0]} ${split[1]}`
+                        let count = nwgCustomers.get(name) || 0
+                        count++
+                        nwgCustomers.set(name, count)
+                    }
+                }
+                else{
+                    let name = split[0]
+                    let count = nwgCustomers.get(name) || 0
+                    count++
+                    nwgCustomers.set(name, count)
+                }
+            }
+        });
+    }
+
+    function countQbCustomers(){
+        qbCustomers = new Map()
+        qbEvents.forEach((event) => {
+            if (!event.isInvoice){
+                //console.log(event.lineDescription)
+                let split = event.lineDescription.split(" ")
+                //console.log(split)
+                if (split.length === 1){
+                    let name = "GT" //hard coded at GT for now because this is the only customer that follows this pattern in Quickbooks
+                    let count = qbCustomers.get(name) || 0 //get's count or set to zero if can't be found
+                    count++
+                    qbCustomers.set(name, count)
+                }
+                else if (split.length === 2){
+                    let name = split[0]
+                    let count = qbCustomers.get(name) || 0
+                    count++
+                    qbCustomers.set(name, count)
+                }
+                else {
+                    if (split[1] === 'NWG' || split[1] === 'VMP' || split[1] === 'EH'){
+                        let name = split[0]
+                        let count = qbCustomers.get(name) || 0
+                        count++
+                        qbCustomers.set(name, count)
+                    } else {
+                        let name = `${split[0]} ${split[1]}`
+                        let count = qbCustomers.get(name) || 0
+                        count++
+                        qbCustomers.set(name, count)
+                    }
+                }
+            }
+            else{
+                let name = `(Invoice for: ${event.name})`
+                let count = qbCustomers.get(name) || 0
+                count++
+                qbCustomers.set(name, count)
+
+            }
+        })
+
     }
 
     function open(){
@@ -75,11 +174,12 @@
   <dialog class="modal" bind:this={countModal}>
     <div class="modal-box w-11/12 max-w-5xl">
         <h3 class="text-lg font-bold">Hello!</h3>
-        <p class="py-4">Click the button below to close</p>
+        <p class="py-4">Press Escape or Click the button below to close</p>
         <div class="flex w-full">
-            {#if nwgEvents.length > 0}
+            {#if nwgCustomers.size > 0}
             <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
                 <table class="table">
+                    <caption class="text-l font-bold py-2 px-4 w-full">NWG Customer Counts</caption>
                     <thead>
                     <tr>
                         <th>Customer</th>
@@ -87,20 +187,21 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {#each nwgEvents as nwgEvent}
+                    {#each nwgCustomers as [key,value]}
                     <tr>
-                        <th>{nwgEvent.customerInfo}</th>
-                        <td>{nwgEvent.amount}</td>
+                        <td>{key}</td>
+                        <td>{value}</td>
                     </tr>
                     {/each}
                     </tbody>
                 </table>
                 </div>
-                {/if}
+            {/if}
             <div class="divider divider-horizontal"></div>
-            {#if qbEvents.length > 0}
+            {#if qbCustomers.size > 0}
             <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
                 <table class="table">
+                    <caption class="text-l font-bold py-2 px-4 w-full">QB Customer Counts</caption>
                     <thead>
                     <tr>
                         <th>Customer</th>
@@ -108,16 +209,16 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {#each qbEvents as qbEvent}
+                    {#each qbCustomers as [key,value]}
                     <tr>
-                        <th>{qbEvent.customerInfo}</th>
-                        <td>{qbEvent.amount}</td>
+                        <td>{key}</td>
+                        <td>{value}</td>
                     </tr>
                     {/each}
                     </tbody>
                 </table>
                 </div>
-                {/if}
+            {/if}
         </div>
         <div class="modal-action">
             <button class="btn" onclick={ close }>Close</button>
