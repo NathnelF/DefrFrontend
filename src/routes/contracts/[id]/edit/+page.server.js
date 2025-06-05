@@ -51,7 +51,7 @@ export async function load({ fetch, params}){
 
 async function getIdByNames({fetch}, customerName, serviceName){
     try{
-        const res = await fetch(`https://localhost:7246/namesToId?customerName=${customerName}&serviceName=${serviceName}`);
+        const res = await fetch(`https://localhost:7246/names_to_ids?customerName=${customerName}&serviceName=${serviceName}`);
 
         if (!res.ok) {
             const errorText = await res.text();
