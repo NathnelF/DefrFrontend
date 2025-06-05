@@ -25,6 +25,9 @@
             fetch(nwgUrl)
         ]);
 
+        qbError = null
+        nwgError = null
+
         if (!qbRes.ok) {
             qbError = await qbRes.text()
             console.log(`qbError: ${qbError}`)
@@ -169,15 +172,15 @@
   <Flatpickr id={"start-date"} label="From" bind:value={startDate}/>
   <Flatpickr id={"end-date"} label="To" bind:value={endDate}/>
   <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={fetchEvents}>Get Events</button>
-  <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={clearEvents}>Clear Events</button>
   <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={ open }>See counts</button>
+  <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={clearEvents}>Clear Events</button>
   <dialog class="modal" bind:this={countModal}>
     <div class="modal-box w-11/12 max-w-5xl">
-        <h3 class="text-lg font-bold">Hello!</h3>
+        <h3 class="text-lg font-bold">Entry Counts</h3>
         <p class="py-4">Press Escape or Click the button below to close</p>
         <div class="flex w-full">
             {#if nwgCustomers.size > 0}
-            <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+            <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-1/2">
                 <table class="table">
                     <caption class="text-l font-bold py-2 px-4 w-full">NWG Customer Counts</caption>
                     <thead>
@@ -187,7 +190,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {#each nwgCustomers as [key,value]}
+                    {#each Array.from(nwgCustomers.entries()).sort((a,b) => a[0].localeCompare(b[0])) as [key,value]}
                     <tr>
                         <td>{key}</td>
                         <td>{value}</td>
@@ -199,7 +202,7 @@
             {/if}
             <div class="divider divider-horizontal"></div>
             {#if qbCustomers.size > 0}
-            <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+            <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-1/2">
                 <table class="table">
                     <caption class="text-l font-bold py-2 px-4 w-full">QB Customer Counts</caption>
                     <thead>
@@ -209,7 +212,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {#each qbCustomers as [key,value]}
+                    {#each Array.from(qbCustomers.entries()).sort((a, b) => a[0].localeCompare(b[0])) as [key,value]}
                     <tr>
                         <td>{key}</td>
                         <td>{value}</td>
