@@ -5,9 +5,9 @@
 
 
 <div class="flex w-full">
-    <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+    <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 ml-5 w-1/2">
     <table class="table text-left">
-        <caption class="text-2xl font-bold p-3 text-left">NWG Recogntion Report</caption>
+        <caption class="text-2xl font-bold px-20 text-center">NWG Recogntion Report</caption>
         <thead>
         <tr>
             <th>Date</th>
@@ -28,9 +28,9 @@
     </table>
     </div>
     <div class="divider divider-horizontal"></div>
-    <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
-    <table class="table text-left">
-        <caption class="text-2xl font-bold p-3 text-left">Quickbooks Recogntion Report</caption>
+    <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-1/2">
+    <table class="table text-left ml-3.5 px-1">
+        <caption class="text-2xl font-bold p-3 text-center px-20">Quickbooks Recogntion Report</caption>
         <thead>
         <tr>
             <th>QB Date</th>
