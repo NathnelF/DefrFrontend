@@ -1,5 +1,5 @@
 <script>
-    let {contracts, names} = $props();
+    let {contracts} = $props();
     import { readableDate } from '../../lib/utils/dateConverter.js'
     import ConfirmModal from '$lib/components/ConfirmModal.svelte';
     import { invalidate } from '$app/navigation';
@@ -95,8 +95,8 @@
       {#each contracts as contract, i}
       <tr>
         <th>{contract.id}</th>
-        <td>{names.customerName}</td>
-        <td>{names.serviceName}</td>
+        <td>{contract.customerName}</td>
+        <td>{contract.serviceName}</td>
         <td>{`${contract.price.toFixed(2)}`}</td>
         <td>{readableDate(contract.currentTermStart)}</td>
         <td>{readableDate(contract.currentTermEnd)}</td>

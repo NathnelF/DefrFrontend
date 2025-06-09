@@ -1,5 +1,4 @@
 <script>
-    import InvoiceDate from './InvoiceDate.svelte';
     import Schedule from './Schedule.svelte'
     import { page } from '$app/stores'
     import Flatpickr from "$lib/components/Flatpickr.svelte";
@@ -208,7 +207,7 @@
 <button class='btn mt-6.5 ml-2' onclick={clearInvoiceDate}>Clear Invoice Date</button>
 {/if}
 </div>
-<Schedule events={events} contractName="Test Customer Test Service"/>
+<Schedule {events}/>
 {/if}
 <a href="/contracts/{id}/schedule"  data-sveltekit-reload class="hidden" bind:this={reloadLink}>Reload</a>
 
