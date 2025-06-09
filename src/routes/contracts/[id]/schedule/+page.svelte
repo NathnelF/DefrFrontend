@@ -200,15 +200,14 @@
 {:else}
 <div class="flex items-center">
 <Flatpickr id={"invoice-date"} label="Invoice Date" bind:value={invoiceDate} />
+<button class='btn mt-6.5 ml-2' onclick={clearSchedule}>Clear Schedule</button>
 {#if !dateExists}
-<button class="btn mt-6 ml-4" onclick={newDateUpdateAmount}>New Date</button>
+<button class="btn mt-6.5 ml-2" onclick={newDateUpdateAmount}>New Date</button>
 {:else}
-<button class="btn mt-6 ml-4" onclick={updateInvoiceDate}>Update Date</button>
+<button class="btn mt-6.5 ml-2" onclick={newDateUpdateAmount}>Update Date</button>
+<button class='btn mt-6.5 ml-2' onclick={clearInvoiceDate}>Clear Invoice Date</button>
 {/if}
 </div>
-<button class='btn' onclick={clearSchedule}>Clear Schedule</button>
-<button class='btn' onclick={updateAmount }>Update Invoice Amount</button>
-<button class='btn' onclick={clearInvoiceDate}>Clear Invoice Date</button>
 <Schedule events={events} contractName="Test Customer Test Service"/>
 {/if}
 <a href="/contracts/{id}/schedule"  data-sveltekit-reload class="hidden" bind:this={reloadLink}>Reload</a>
