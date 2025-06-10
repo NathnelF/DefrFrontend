@@ -3,6 +3,7 @@
     import Flatpickr from "$lib/components/Flatpickr.svelte";
     import { disableScrollHandling } from "$app/navigation";
     import { readableDate } from "$lib/utils/dateConverter";
+    import Report from "../report/Report.svelte";
     let currentDay = new Date();
     let firstDayOfYear = new Date(currentDay.getFullYear(), 0, 1);
 
@@ -14,8 +15,11 @@
     let qbError = $state(null)
     let found = $state(false)
     let countModal = $state(null)
+    let reportModal = $state(null)
     let nwgCustomers = $state(new Map())
     let qbCustomers = $state(new Map())
+    let nwgBalance = $state(new Map())
+    let qbBalance = $state(new Map())
 
     async function fetchEvents(){
         const qbUrl = `https://localhost:7246/get_qb_event_range?startDate=${startDate}&endDate=${endDate}`
@@ -43,6 +47,7 @@
             nwgEvents = await nwgRes.json()
             countNwgCustomers()
             countQbCustomers()
+            getBalances()
             found = true
         }
 
@@ -159,12 +164,51 @@
 
     }
 
-    function open(){
+    function getBalances(){
+        nwgBalance = new Map()
+        qbBalance = new Map()
+
+        nwgEvents.forEach( (event) => {
+            const date = new Date(event.date)
+            const dateKey = `${date.toLocaleString('default', { month: 'long' })}, ${date.getFullYear()}`
+            let count = nwgBalance.get(dateKey) || null
+            if (count) {
+                nwgBalance.set(dateKey, count + event.amount)
+            } else {
+                nwgBalance.set(dateKey, event.amount)
+            }
+            
+
+        })
+
+        qbEvents.forEach( (event) => {
+            const date = new Date(event.date)
+            const dateKey = `${date.toLocaleString('default', { month: 'long' })}, ${date.getFullYear()}`
+            let count = qbBalance.get(dateKey) || null
+            if (count) {
+                qbBalance.set(dateKey, count + event.amount)
+            } else {
+                qbBalance.set(dateKey, event.amount)
+            }
+        })
+
+        
+    }
+
+    function openCount(){
         countModal.showModal()
     }
 
-    function close(){   
+    function openReport(){
+        reportModal.showModal()
+    }
+
+    function closeCount(){   
         countModal.close()
+    }
+
+    function closeReport(){
+        reportModal.close()
     }
 </script>
 
@@ -172,8 +216,9 @@
   <Flatpickr id={"start-date"} label="From" bind:value={startDate}/>
   <Flatpickr id={"end-date"} label="To" bind:value={endDate}/>
   <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={fetchEvents}>Get Events</button>
-  <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={ open }>See counts</button>
+  <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={ openCount }>See counts</button>
   <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={clearEvents}>Clear Events</button>
+  <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={ openReport }>Show Balances</button>
   <dialog class="modal" bind:this={countModal}>
     <div class="modal-box w-11/12 max-w-5xl">
         <h3 class="text-lg font-bold">Entry Counts:</h3>
@@ -225,11 +270,67 @@
             {/if}
         </div>
         <div class="modal-action">
-            <button class="btn" onclick={ close }>Close</button>
+            <button class="btn" onclick={ closeCount }>Close</button>
         </div>
     </div>
   </dialog>
 </div>
+
+<dialog class="modal" bind:this={reportModal}>
+    <div class="modal-box w-11/12 max-w-5xl">
+        <h3 class="text-lg font-bold">Monthly Balances:</h3>
+        <p class="py-4">Press Escape or Click the button below to close</p>
+        <div class="flex w-full">
+            {#if nwgCustomers.size > 0}
+            <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-1/2">
+                <table class="table">
+                    <caption class="text-l font-bold py-2 px-4 w-full">NWG Balances</caption>
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Balance</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {#each Array.from(nwgBalance.entries()) as [date, balance]}
+                        <tr>
+                            <td>{date}</td>
+                            <td>{balance}</td>
+                        </tr>
+                        {/each}
+                    </tbody>
+                </table>
+                </div>
+            {/if}
+            <div class="divider divider-horizontal"></div>
+            {#if qbCustomers.size > 0}
+            <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-1/2">
+                <table class="table">
+                    <caption class="text-l font-bold py-2 px-4 w-full">QB Balances</caption>
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Balance</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {#each Array.from(qbBalance.entries()) as [date, balance]}
+                        <tr>
+                            <td>{date}</td>
+                            <td>{balance}</td>
+                        </tr>
+                        {/each}
+                    </tbody>
+                </table>
+                </div>
+            {/if}
+        </div>
+        <div class="modal-action">
+            <button class="btn" onclick={ closeReport }>Close</button>
+        </div>
+    </div>
+</dialog>
+
 
 
 {#if qbError}
