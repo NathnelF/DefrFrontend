@@ -1,6 +1,6 @@
 export async function GET() {
   try {
-    const res = await fetch('http://localhost:5025/contracts');
+    const res = await fetch('https://localhost:7246/contracts');
     if (!res.ok) {
       return new Response('Failed to fetch contracts server', {
         status: res.status,
