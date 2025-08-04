@@ -26,8 +26,8 @@
         const nwgUrl = `https://localhost:7246/report_events?startDate=${startDate}&endDate=${endDate}`
 
         const [qbRes, nwgRes] = await Promise.all([
-            fetch(qbUrl),
-            fetch(nwgUrl)
+            fetch(qbUrl, { credentials: 'include'}),
+            fetch(nwgUrl, { credentials: 'include'})
         ]);
 
         qbError = null

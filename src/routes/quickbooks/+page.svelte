@@ -22,7 +22,7 @@
      const url = `https://localhost:7246/get_qb_event_range?startDate=${startDate}&endDate=${endDate}`
      loadError = null
      try{
-        const res = await fetch(url)
+        const res = await fetch(url, { credentials: 'include'})
         if (!res.ok) {
             loadError = await res.text()
             console.log(`Error on request: ${loadError}`)

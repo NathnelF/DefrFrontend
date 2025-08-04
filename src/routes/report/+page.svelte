@@ -16,7 +16,7 @@
       loadError = null
       try {
         console.log('attempting to load events')
-        const res = await fetch(url)
+        const res = await fetch(url, { credentials: 'include'})
         if (!res.ok) {
           loadError = await res.text()
           console.log(loadError)

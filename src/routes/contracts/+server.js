@@ -1,4 +1,4 @@
-export async function GET() {
+export async function GET({ fetch }) {
   try {
     const res = await fetch('https://localhost:7246/contracts');
     if (!res.ok) {

@@ -22,7 +22,8 @@
 
         const res = await fetch(`https://localhost:7246/gen_schedule?contractId=${id}`,
           {
-            method: 'POST'
+            method: 'POST',
+            credentials: 'include'
           }
         );
         if (!res.ok) {
@@ -48,7 +49,8 @@
       try{
         const res = await fetch(`https://localhost:7246/clear_schedule?contractId=${id}`, 
           {
-            method: 'DELETE'
+            method: 'DELETE',
+            credentials: 'include'
           }
         );
         if (!res.ok) {
@@ -75,7 +77,8 @@
           },
           body: JSON.stringify({
             invoiceDate: invoiceDate
-          })
+          }),
+          credentials: 'include'
         });
 
         if (!res.ok) {
@@ -111,7 +114,8 @@
         },
         body: JSON.stringify({
           invoiceDate: invoiceDate
-      })
+      }),
+      credentials: 'include'
       })
 
       if (!dateRes.ok){
@@ -125,7 +129,8 @@
       }
 
       const amountRes = await fetch(amountUrl, {
-        method: 'PUT'
+        method: 'PUT',
+        credentials: 'include'
       })
 
       if (!amountRes.ok){
@@ -145,7 +150,8 @@
       try{
         const amountUrl = `https://localhost:7246/update_schedule_invoice_amount?Id=${id}`
         const res = await fetch(amountUrl, {
-          method: 'PUT'
+          method: 'PUT',
+          credentials: 'include'
         })
 
         if (!res.ok){
@@ -169,7 +175,8 @@
     async function clearInvoiceDate(){
       try{
         const res = await fetch(`https://localhost:7246/reset_invoice_date?contractId=${id}`, {
-          method: 'PUT'
+          method: 'PUT',
+          credentials: 'include'
         })
         if (!res.ok) {
           console.log('could not reset invocie date')
@@ -182,10 +189,6 @@
         console.log(error)
       }
     }
-
-
-
-
 
 </script>
 

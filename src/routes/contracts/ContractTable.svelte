@@ -16,7 +16,8 @@
      async function deleteContract() {
       console.log(`attempt delete on ${selectedId}`)
       const res = await fetch(`https://localhost:7246/delete_contract?contractId=${selectedId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include'
       })
       if (!res.ok){
         const deleteError = await res.text()
@@ -37,7 +38,8 @@
     const url = "https://localhost:7246/gen_all_schedules"
     try {
       const res = await fetch(url, {
-        method: 'POST'
+        method: 'POST',
+        credentials: 'include'
       })
 
       if (!res.ok) {
@@ -56,7 +58,8 @@
     const url = "https://localhost:7246/clear_all_schedules"
     try {
       const res = await fetch(url, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: 'include'
       })
 
       if (!res.ok) {
