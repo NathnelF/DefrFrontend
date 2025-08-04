@@ -23,8 +23,4 @@
 
 {#if form?.error}
 <p>{form?.error}</p>
-<<<<<<< HEAD
 {/if}
-=======
-{/if}
->>>>>>> cf1ac7a (updated authorization.)
