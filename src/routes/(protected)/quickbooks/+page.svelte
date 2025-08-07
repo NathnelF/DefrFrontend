@@ -1,5 +1,5 @@
 <script>
-    import Flatpickr from '../../lib/components/Flatpickr.svelte';
+    import Flatpickr from '$lib/components/Flatpickr.svelte';
     import QbReport from './QBReport.svelte';
 
     let currentDay = new Date();

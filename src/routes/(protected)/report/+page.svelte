@@ -1,5 +1,5 @@
 <script>
-    import Flatpickr from '../../lib/components/Flatpickr.svelte';
+    import Flatpickr from '$lib/components/Flatpickr.svelte';
     import Report from './Report.svelte'
     let currentDay = new Date();
     let firstDayOfYear = new Date(currentDay.getFullYear(), 0, 1);

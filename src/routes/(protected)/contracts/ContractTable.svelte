@@ -1,6 +1,6 @@
 <script>
     let {contracts} = $props();
-    import { readableDate } from '../../lib/utils/dateConverter.js'
+    import { readableDate } from 'root/lib/utils/dateConverter.js'
     import ConfirmModal from '$lib/components/ConfirmModal.svelte';
     import { invalidate } from '$app/navigation';
 

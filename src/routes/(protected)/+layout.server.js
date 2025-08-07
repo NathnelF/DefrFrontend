@@ -1,6 +1,6 @@
-import { redirect } from '@svelte.js'
+import { redirect } from '@sveltejs/kit'
 
-export function load({ fetch }){
+export function load({ locals }){
   if (!locals.user){
     throw redirect(303, '/')
   }
