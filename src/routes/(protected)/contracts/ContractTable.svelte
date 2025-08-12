@@ -8,6 +8,62 @@
     let selectedId = $state(null)
     let reloadLink
 
+    let sortColumn = $state(' ')
+    let sortDirection = $state('asc')
+
+
+    let sortedContracts = $derived.by(() => {
+      if (!sortColumn) return contracts;
+
+      return [...contracts].sort((a,b) => {
+        let aValue, bValue
+
+        switch(sortColumn){
+          case 'customer':
+            aValue = a.customerName.toLowerCase()
+            bValue = b.customerName.toLowerCase()
+            break;
+          case 'service':
+            aValue = a.serviceName.toLowerCase()
+            bValue = b.serviceName.toLowerCase()
+            break;
+          case 'amount':
+            aValue = a.price
+            bValue = b.price
+            break;
+          case 'termStart':
+            aValue = new Date(a.currentTermStart)
+            bValue = new Date(b.currentTermStart)
+            break;
+          case 'termStart':
+            aValue = new Date(a.currentTermEnd)
+            bValue = new Date(b.currentTermEnd)
+            break;
+          default:
+            return 0;
+        }
+
+        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
+        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+
+      })
+    })
+
+    function handleSort(column){
+      if (sortColumn === column){
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc'
+      }
+      else {
+        sortColumn = column;
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc'
+      }
+    }
+
+    function getSortIndicator(column){
+      if (sortColumn !== column) return '↕️'
+      return sortDirection === 'asc' ? '⬆️' : '⬇️'
+    }
+
     function displayModal(contractId){
       selectedId = contractId
       modalRef.open()
@@ -75,6 +131,24 @@
   }
 </script>
 
+<style>
+  .sortable-header {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s;
+  }
+
+  .sortable-header:hover {
+    background-color: rgba(0,0,0, 0.05);
+  }
+
+  .sort-indicator {
+    margin-left: 4px;
+    font-size: 0.8em;
+    opactity: 0.7;
+  }
+</style>
+
 <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
   <div class="flex mb-5">
     <p class="text-2xl font-bold p-3 text-left">NWG Recurring Contracts</p>
@@ -86,16 +160,32 @@
     <thead>
       <tr>
         <th>Contract Id</th>
-        <th>Customer</th>
-        <th>Service</th>
-        <th>Annual Amount</th>
-        <th>Current Term Start</th>
-        <th>Current Term End</th>
-        <th class="text-center">Actions</th>
+        <th class="sortable-header" onclick={() => handleSort('customer')}>
+          Customer
+          <span class="sort-indicator">{getSortIndicator('customer')}</span>
+        </th>
+        
+        <th class="sortable-header" onclick={() => handleSort('service')}>
+                  Service
+                  <span class="sort-indicator">{getSortIndicator('service')}</span>
+                </th>
+        <th class="sortable-header" onclick={() => handleSort('price')}>
+                  Price
+                  <span class="sort-indicator">{getSortIndicator('price')}</span>
+                </th>
+        <th class="sortable-header" onclick={() => handleSort('termStart')}>
+                  Current Term Start
+                  <span class="sort-indicator">{getSortIndicator('termStart')}</span>
+                </th>
+        <th class="sortable-header" onclick={() => handleSort('termEnd')}>
+                  Current Term End
+                  <span class="sort-indicator">{getSortIndicator('termEnd')}</span>
+                </th>
+                <th class="text-center">Actions</th>
       </tr>
     </thead>
     <tbody>
-      {#each contracts as contract, i}
+      {#each sortedContracts as contract, i}
       <tr>
         <th>{contract.id}</th>
         <td>{contract.customerName}</td>

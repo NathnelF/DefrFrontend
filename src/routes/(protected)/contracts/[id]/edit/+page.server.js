@@ -7,7 +7,7 @@
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 import { redirect } from '@sveltejs/kit';
-import { IsoDate } from '../../../../lib/utils/dateConverter.js'
+import { IsoDate } from '$lib/utils/dateConverter.js'
 
 //going to edit get contract to also return names.
 

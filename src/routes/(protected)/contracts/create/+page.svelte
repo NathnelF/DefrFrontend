@@ -15,8 +15,8 @@
     </label>
 
     <label class="my-2">
-        Annual Amount:
-        <input name="price" class="pl-1" placeholder="Annual amount" type="number" required value="1560"/>
+        Contract Value:
+        <input name="price" class="pl-1" placeholder="Contract Value" type="number" required value="1560"/>
     </label>
 
     <label class="my-2">
@@ -25,12 +25,12 @@
     </label>
 
     <label class="my-2">
-        Customer Term Start:
+        Current Term Start:
         <input name="currentTermStart"  class="pl-1" placeholder="Start of current term"  required value="1/10/2025"/>
     </label>
 
     <label class="my-2">
-        Customer Term End:
+        Current Term End:
         <input name="currentTermEnd" class="pl-1 " placeholder="End of current term"  required value="1/09/2026"/>
     </label>
 

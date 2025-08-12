@@ -1,6 +1,6 @@
 <script>
     let { contract, form } = $props();
-    import { readableDate } from '../../../../lib/utils/dateConverter.js'
+    import { readableDate } from '$lib/utils/dateConverter.js'
 
 </script>
 
@@ -17,7 +17,7 @@
     </label>
 
     <label class="my-2">
-        Annual Amount:
+        Contract Value:
         <input name="price" value={contract.price} class="pl-1"/>
     </label>
 
@@ -27,12 +27,12 @@
     </label> -->
 
     <label class="my-2">
-        Customer Term Start:
+        Current Term Start:
         <input name="currentTermStart" value={readableDate(contract.currentTermStart)} class="pl-1"/>
     </label>
 
     <label class="my-2">
-        Customer Term End:
+        Current Term End:
         <input name="currentTermEnd" value={readableDate(contract.currentTermEnd)} class="pl-1"/>
     </label>
 

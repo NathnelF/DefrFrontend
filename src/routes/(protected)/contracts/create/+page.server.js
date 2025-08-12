@@ -1,5 +1,5 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-import { IsoDate } from '../../../lib/utils/dateConverter.js'
+import { IsoDate } from '$lib/utils/dateConverter.js'
 import { redirect } from '@sveltejs/kit';
 
 
