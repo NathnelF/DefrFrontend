@@ -27,7 +27,7 @@
             aValue = a.serviceName.toLowerCase()
             bValue = b.serviceName.toLowerCase()
             break;
-          case 'amount':
+          case 'price':
             aValue = a.price
             bValue = b.price
             break;
@@ -35,7 +35,7 @@
             aValue = new Date(a.currentTermStart)
             bValue = new Date(b.currentTermStart)
             break;
-          case 'termStart':
+          case 'termEnd':
             aValue = new Date(a.currentTermEnd)
             bValue = new Date(b.currentTermEnd)
             break;
