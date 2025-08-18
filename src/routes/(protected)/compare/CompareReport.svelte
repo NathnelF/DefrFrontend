@@ -93,6 +93,164 @@
       if (sortQbColumn  !== column) return '↕️'
       return sortQbDirection === 'asc' ? '⬆️' : '⬇️'
     }
+
+    //diff functionality
+    //
+    function normalizeContractName(name){
+      if (!name) return ' '
+
+      //add name -> invoicer maps.
+
+      return name.trim().toLowerCase()
+      .replace(/\s+/g, ' ')
+      .replace (/\(invoice for:\s*/gi, '')
+      .replace(/\)/g, '')
+      .replace(/\(/g, '')
+      .replace(/-/g, ' ')
+      .trim()
+
+      
+    }
+
+    function findMatchingEvents() {
+      console.log('hello from find matching events')
+      const matches = new Map()
+      const nwgOnly = []
+      const qbOnly = []
+      const amountMismatches = []
+
+      const nwgEventsMap = new Map()
+      const qbEventsMap = new Map()
+
+      console.log('=== DEBUGGING ===')
+      console.log(nwgEvents.slice(0,3))
+      console.log(qbEvents.slice(0,3))
+
+      nwgEvents.forEach((event, index) => {
+        const normalizedName = normalizeContractName(event.customerInfo)
+        const strippedDate = new Date(event.date)
+        const normalizedDate = `${strippedDate.getFullYear()}-${String(strippedDate.getMonth()+1).padStart(2, '0')}`
+        const key = `${normalizedDate}_${normalizedName}`
+
+        if (index < 3){
+          console.log(`NWG ${index}: "${event.customerInfo}" --> ${normalizedName} --> key: "${key}"`)
+        }
+
+        if (!nwgEventsMap.has(key)){
+          nwgEventsMap.set(key, [])
+        }
+        nwgEventsMap.get(key).push({...event, originalIndex: index })
+      })
+
+      qbEvents.forEach((event, index) => {
+        let comparisonName = ''
+
+        if (event.isInvoice && event.name){
+          comparisonName = `(invoice for: ${event.name})`
+                }
+
+        else if (event.lineDescription){
+          comparisonName = event.lineDescription
+        }
+
+        const normalizedName = normalizeContractName(comparisonName)
+        const strippedDate = new Date(event.date)
+        const normalizedDate = `${strippedDate.getFullYear()}-${String(strippedDate.getMonth()+1).padStart(2, '0')}`
+        const key = `${normalizedDate}_${normalizedName}`
+
+
+        if (index < 3){
+          console.log(`QB${index}: "${event.name} or "${event.lineDescription}" --> ${normalizedName} --> "${key}"`)
+        }
+
+        if (!qbEventsMap.has(key)){
+          qbEventsMap.set(key, [])
+        }
+
+        qbEventsMap.get(key).push({...event, originalIndex: index, comparisonName })
+        
+
+      })
+
+      const processedNwgKeys = new Set()
+      const processedQbKeys = new Set()
+
+      //check for matches
+      for (const [key, nwgEventsList] of nwgEventsMap) {
+        if (qbEventsMap.has(key)){
+          const qbEventsList = qbEventsMap.get(key)
+
+          nwgEventsList.forEach(nwgEvent => {
+            const matchingQbEvent = qbEventsList.find(qbEvent => 
+              Math.abs(Math.abs(nwgEvent.amount) - Math.abs(qbEvent.amount)) < 0.01
+            )
+
+            if (matchingQbEvent){
+              console.log('match found:',  matchingQbEvent.originalIndex)
+              console.log('NWG event: ', nwgEvent)
+              console.log('original index: ', nwgEvent.originalIndex)
+              matches.set(nwgEvent.originalIndex, matchingQbEvent.originalIndex)
+              console.log(Array.from(matches.entries()))
+              processedNwgKeys.add(key)
+              processedQbKeys.add(key)
+            } else {
+              console.log("no matching event found : ", nwgEvent.originalIndex)
+              const closestQbEvent = qbEventsList[0]
+              amountMismatches.push({
+                nwgEvent,
+                qbEvent: closestQbEvent ,
+                nwgIndex: nwgEvent.originalIndex,
+                qbIndex: closestQbEvent .originalIndex
+              })
+              processedNwgKeys.add(key)
+              processedQbKeys.add(key)
+            }
+          })
+        }
+      }
+
+      for (const [key, nwgEventsList] of nwgEventsMap){
+        if (!processedNwgKeys.has(key)){
+          nwgEventsList.forEach(event => {
+            nwgOnly.push(event.originalIndex)
+          })
+        }
+      }
+
+      for (const [key, qbEventsList] of qbEventsMap){
+        if (!processedQbKeys.has(key)){
+          qbEventsList.forEach(event => {
+            qbOnly.push(event.originalIndex)
+          })
+        }
+      }
+
+      console.log('NWG Event Map Keys:', Array.from(nwgEventsMap.keys()).slice(0,5))
+      console.log('Qb Event Map Keys:', Array.from(qbEventsMap.keys()).slice(0,5))
+      console.log('final matches:', matches)
+      console.log('final mismatches: ', amountMismatches)
+      console.log('=== END DEBUG ===')
+
+      return {matches, nwgOnly, qbOnly, amountMismatches}
+    }
+
+    const eventAnalysis = $derived.by(() => findMatchingEvents())
+    const matchedQbIndices = $derived(Array.from(eventAnalysis.matches.values()))
+
+    function getNwgRowClass(index){
+      if (eventAnalysis.nwgOnly.includes(index)) return 'bg-blue-300 border-l-4 border-l-blue-500'
+      if (eventAnalysis.amountMismatches.some(m => m.nwgIndex === index)) return 'bg-orange-300 border-l-4 border-l-orange-500'
+      if (eventAnalysis.matches.has(index)) return 'bg-green-300 border-l-4 border-l-green-500'
+      return ''
+    }
+
+    function getQbRowClass(index){
+      if (eventAnalysis.qbOnly.includes(index)) return 'bg-red-300 border-l-4 border-l-red-500'
+      if (eventAnalysis.amountMismatches.some(m => m.qbIndex === index)) return 'bg-orange-300 border-l-4 border-l-orange-500'
+      if (matchedQbIndices.includes(index)) return 'bg-green-300 border-l-4 border-l-green-500'
+      return ''
+    }
+    
 </script>
 
 <style>
@@ -109,9 +267,38 @@
   .sort-indicator {
     margin-left: 4px;
     font-size: 0.8em;
-    opactity: 0.7;
+    opacity: 0.7;
   }
 </style>
+
+<div class='mb-4 p-4 rounded-lg border'>
+  <h3 class='text-lg font-semibold mb-2'>Legend</h3>
+  <div class='grid grid-cols-2 md:grid-cols-4 gap-2 text-sm'>
+    
+    <div class='flex items-center'>
+      <div class='w-4 h-4 bg-green-300 border-l-4 border-l-green-500 mr-2'></div>
+      <span>Matched Events</span>
+    </div>
+
+    <div class='flex items-center'>
+      <div class='w-4 h-4 bg-blue-300 border-l-4 border-l-blue-500 mr-2'></div>
+      <span>NWG Only</span>
+    </div>
+
+    <div class='flex items-center'>
+      <div class='w-4 h-4 bg-red-300 border-l-4 border-l-red-500 mr-2'></div>
+      <span>QB Only</span>
+    </div>
+
+    <div class='flex items-center'>
+      <div class='w-4 h-4 bg-orange-300 border-l-4 border-l-orange-500 mr-2'></div>
+      <span>Amount Mismatch</span>
+    </div>
+
+  </div>
+</div>
+
+// potentially include summary info
 
 <div class="flex w-full">
     <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 ml-5 w-1/2">
@@ -134,8 +321,8 @@
         </tr>
         </thead>
         <tbody>
-        {#each sortedNwgEvents as event}
-        <tr>
+        {#each sortedNwgEvents as event, index}
+        <tr class={getNwgRowClass(index)}>
             <td>{readableDate(event.date)}</td>
             <td>{event.customerInfo}</td>
             <td>{event.amount.toFixed(2)}</td>
@@ -170,8 +357,8 @@
         </tr>
         </thead>
         <tbody>
-        {#each sortedQbEvents as qbevent}
-        <tr>
+        {#each sortedQbEvents as qbevent, index}
+         <tr class={getQbRowClass(index)}>
             <td>{readableDate(qbevent.date)}</td>
             <td>{qbevent.lineDescription}</td>
             <td>{qbevent.name}</td>
