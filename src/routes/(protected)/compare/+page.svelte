@@ -3,6 +3,7 @@
     import Flatpickr from "$lib/components/Flatpickr.svelte";
     import { disableScrollHandling } from "$app/navigation";
     import { readableDate } from "$lib/utils/dateConverter";
+    import { USDollar } from "$lib/utils/currencyFormat";
     import Report from "../report/Report.svelte";
     let currentDay = new Date();
     let firstDayOfYear = new Date(currentDay.getFullYear(), 0, 1);
@@ -14,12 +15,114 @@
     let nwgError = $state(null)
     let qbError = $state(null)
     let found = $state(false)
-    let countModal = $state(null)
-    let reportModal = $state(null)
-    let nwgCustomers = $state(new Map())
-    let qbCustomers = $state(new Map())
-    let nwgBalance = $state(new Map())
-    let qbBalance = $state(new Map())
+
+    let startingBalance = $state(1000)
+    let monthlyBalances = $state([])
+    let balanceModal = $state(null)
+
+    function nextMonth(date){
+      let copyDate = new Date(date)
+      copyDate.setDate(1)
+      copyDate.setMonth(date.getMonth() + 1)
+
+       return copyDate
+    }
+
+     function getApplicableMonths(start, end){
+            let begin = new Date(start.replaceAll('-', '/'))
+            console.log('begin', begin)
+            let done = new Date(end.replaceAll('-', '/'))
+            console.log('end', done)
+
+            let validMonths = []
+
+            let month = new Date(begin)
+            validMonths.push(month)
+            console.log('first push', month)
+            while (month < done){
+                let temp = new Date(month)
+                temp = nextMonth(month)
+                if (temp >= done){
+                  break;
+                }
+                month = temp
+                validMonths.push(month)
+                console.log('pushed: ', month)
+            }
+
+            for (let i = 0; i < validMonths.length; i++){
+                validMonths[i] = validMonths[i].toLocaleDateString('en-CA', {
+                  year: 'numeric',
+                  month: 'long'
+                })
+            }
+
+            return validMonths
+        }
+
+    function getMonthlyBalances() {
+        const months = getApplicableMonths(startDate, endDate)
+        console.log(months)
+
+        const monthlyData = months.map((monthName, index) => {
+            const monthIndex = index + 1
+
+            const nwgMonthEvents = nwgEvents.filter(event => {
+                const eventDate = new Date(event.date)
+                return eventDate.getMonth() + 1 === monthIndex // && year matches 
+            })
+
+            const qbMonthEvents = qbEvents.filter(event => {
+                const eventDate = new Date(event.date)
+                return eventDate.getMonth() + 1 === monthIndex // && year matches
+            })
+
+            let nwgSum = 0
+            nwgMonthEvents.forEach(event => {
+                nwgSum += (event.amount || 0)
+            })            
+
+            let qbSum = 0
+            qbMonthEvents.forEach((event) => {
+                qbSum += (event.amount || 0)
+            })
+
+            return {
+                month: monthName,
+                nwgChange: nwgSum,
+                qbChange: qbSum
+            }
+
+        })
+
+        console.log(monthlyData)
+
+        let nwgRunningBalance = startingBalance
+        let qbRunningBalance = startingBalance
+
+        return monthlyData.map(monthData => {
+            nwgRunningBalance += monthData.nwgChange
+            qbRunningBalance += monthData.qbChange
+
+            return {
+                ...monthData,
+                nwgBalance: nwgRunningBalance,
+                qbBalance: qbRunningBalance,
+                difference: nwgRunningBalance - qbRunningBalance
+            }
+        })
+        
+    }
+
+    function openBalanceModal(){
+        balanceModal.showModal()
+    }
+
+    function closeBalanceModal(){
+        balanceModal.close()
+    }
+
+    
 
     async function fetchEvents(){
         const qbUrl = `https://localhost:7246/get_qb_event_range?startDate=${startDate}&endDate=${endDate}`
@@ -45,10 +148,11 @@
             console.log(`nwgError: ${nwgError}`)
         } else{
             nwgEvents = await nwgRes.json()
-            countNwgCustomers()
-            countQbCustomers()
-            getBalances()
             found = true
+        }
+
+        if (qbError === null && nwgError === null){
+            monthlyBalances = getMonthlyBalances()
         }
 
         return (
@@ -63,275 +167,50 @@
     function clearEvents(){
         nwgEvents = []
         qbEvents = []
-        nwgCustomers = new Map()
-        qbCustomers = new Map()
         qbError =null
         nwgError = null
         found = false
+        monthlyBalances = []
     }
 
     
 
-    function countNwgCustomers(){
-        nwgCustomers = new Map();
-        nwgEvents.forEach((event) => {
-            if (event.amount > 0){
-                let split = event.customerInfo.split(" ")
-                if (split.length > 2){
-                    if (split[1] === 'NWG' || split[1] === 'VMP' || split[1] === 'EH'){
-                        let name = `(Invoice for: ${split[0]})`
-                        let count = nwgCustomers.get(name) || 0
-                        count++
-                        nwgCustomers.set(name, count)
-                    } else {
-                        let name = `(Invoice for: ${split[0]} ${split[1]})`
-                        let count = nwgCustomers.get(name) || 0
-                        count++
-                        nwgCustomers.set(name, count)
-                    }
-                }
-                else{
-                    let name = `(Invoice for: ${split[0]})`
-                    let count = nwgCustomers.get(name) || 0
-                    count++
-                    nwgCustomers.set(name, count)
-                }
-            } 
-            else {
-                let split = event.customerInfo.split(" ")
-                if (split.length > 2){
-                    if (split[1] === 'NWG' || split[1] === 'VMP' || split[1] === 'EH'){
-                        let name = split[0]
-                        let count = nwgCustomers.get(name) || 0
-                        count++
-                        nwgCustomers.set(name, count)
-                    } else {
-                        let name = `${split[0]} ${split[1]}`
-                        let count = nwgCustomers.get(name) || 0
-                        count++
-                        nwgCustomers.set(name, count)
-                    }
-                }
-                else{
-                    let name = split[0]
-                    let count = nwgCustomers.get(name) || 0
-                    count++
-                    nwgCustomers.set(name, count)
-                }
-            }
-        });
-    }
-
-    function countQbCustomers(){
-        qbCustomers = new Map()
-        qbEvents.forEach((event) => {
-            if (!event.isInvoice){
-                let split = event.lineDescription.split(" ")
-                if (split.length === 1){
-                    let name = "GT" //hard coded at GT for now because this is the only customer that follows this pattern in Quickbooks
-                    let count = qbCustomers.get(name) || 0
-                    count++
-                    qbCustomers.set(name, count)
-                }
-                else if (split.length === 2){
-                    let name = split[0]
-                    let count = qbCustomers.get(name) || 0
-                    count++
-                    qbCustomers.set(name, count)
-                }
-                else {
-                    if (split[1] === 'NWG' || split[1] === 'VMP' || split[1] === 'EH'){
-                        let name = split[0]
-                        let count = qbCustomers.get(name) || 0
-                        count++
-                        qbCustomers.set(name, count)
-                    } else {
-                        let name = `${split[0]} ${split[1]}`
-                        let count = qbCustomers.get(name) || 0
-                        count++
-                        qbCustomers.set(name, count)
-                    }
-                }
-            }
-            else{
-                let name = `(Invoice for: ${event.name})`
-                let count = qbCustomers.get(name) || 0
-                count++
-                qbCustomers.set(name, count)
-
-            }
-        })
-
-    }
-
-    function getBalances(){
-        nwgBalance = new Map()
-        qbBalance = new Map()
-
-        nwgEvents.forEach( (event) => {
-            const date = new Date(event.date)
-            const dateKey = `${date.toLocaleString('default', { month: 'long' })}, ${date.getFullYear()}`
-            let count = nwgBalance.get(dateKey) || null
-            if (count) {
-                nwgBalance.set(dateKey, count + event.amount)
-            } else {
-                nwgBalance.set(dateKey, event.amount)
-            }
-            
-
-        })
-
-        qbEvents.forEach( (event) => {
-            const date = new Date(event.date)
-            const dateKey = `${date.toLocaleString('default', { month: 'long' })}, ${date.getFullYear()}`
-            let count = qbBalance.get(dateKey) || null
-            if (count) {
-                qbBalance.set(dateKey, count + event.amount)
-            } else {
-                qbBalance.set(dateKey, event.amount)
-            }
-        })
-
-        
-    }
-
-    function openCount(){
-        countModal.showModal()
-    }
-
-    function openReport(){
-        reportModal.showModal()
-    }
-
-    function closeCount(){   
-        countModal.close()
-    }
-
-    function closeReport(){
-        reportModal.close()
-    }
 </script>
 
 <div class="flex items-center mb-4">
   <Flatpickr id={"start-date"} label="From" bind:value={startDate}/>
   <Flatpickr id={"end-date"} label="To" bind:value={endDate}/>
+  <input class="input mt-6.5 ml-3 py-5 rounded-md" type="number" bind:value={startingBalance}/>
   <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={fetchEvents}>Get Events</button>
-  <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={ openCount }>See counts</button>
   <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={clearEvents}>Clear Events</button>
-  <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={ openReport }>Show Balances</button>
-  <dialog class="modal" bind:this={countModal}>
-    <div class="modal-box w-11/12 max-w-5xl">
-        <h3 class="text-lg font-bold">Entry Counts:</h3>
-        <h3>{readableDate(startDate)} -- {readableDate(endDate)}</h3>
-        <p class="py-4">Press Escape or Click the button below to close</p>
-        <div class="flex w-full">
-            {#if nwgCustomers.size > 0}
-            <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-1/2">
-                <table class="table">
-                    <caption class="text-l font-bold py-2 px-4 w-full">NWG Customer Counts</caption>
-                    <thead>
-                    <tr>
-                        <th>Customer</th>
-                        <th>Count</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {#each Array.from(nwgCustomers.entries()).sort((a,b) => a[0].localeCompare(b[0])) as [key,value]}
-                    <tr>
-                        <td>{key}</td>
-                        <td>{value}</td>
-                    </tr>
-                    {/each}
-                    </tbody>
-                </table>
-                </div>
-            {/if}
-            <div class="divider divider-horizontal"></div>
-            {#if qbCustomers.size > 0}
-            <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-1/2">
-                <table class="table">
-                    <caption class="text-l font-bold py-2 px-4 w-full">QB Customer Counts</caption>
-                    <thead>
-                    <tr>
-                        <th>Customer</th>
-                        <th>Count</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {#each Array.from(qbCustomers.entries()).sort((a, b) => a[0].localeCompare(b[0])) as [key,value]}
-                    <tr>
-                        <td>{key}</td>
-                        <td>{value}</td>
-                    </tr>
-                    {/each}
-                    </tbody>
-                </table>
-                </div>
-            {/if}
-        </div>
-        <div class="modal-action">
-            <button class="btn" onclick={ closeCount }>Close</button>
-        </div>
-    </div>
-  </dialog>
+  <button class="btn mt-6.5 ml-3 px-10 py-5 rounded-md" onclick={openBalanceModal}>Monthly Balances</button>
 </div>
 
-<dialog class="modal" bind:this={reportModal}>
-    <div class="modal-box w-11/12 max-w-5xl">
-        <h3 class="text-lg font-bold">Monthly Balances:</h3>
-        <p class="py-4">Press Escape or Click the button below to close</p>
-        <div class="flex w-full">
-            {#if nwgCustomers.size > 0}
-            <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-1/2">
-                <table class="table">
-                    <caption class="text-l font-bold py-2 px-4 w-full">NWG Balances</caption>
-                    <thead>
+<dialog class="modal" bind:this={balanceModal}>
+    <div class="modal-box w-11/12 max-w-4xl">
+        <table class="table text-left">
+        <caption>{startingBalance}</caption>
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>NWG Balance</th>
+                    <th>QB Balance</th>
+                    <th>Difference</th>
+                </tr>
+            </thead>
+            <tbody>
+                {#each monthlyBalances as monthly}
                     <tr>
-                        <th>Date</th>
-                        <th>Balance</th>
+                        <td>{monthly.month}</td>
+                        <td>{`${USDollar.format(monthly.nwgBalance)}`}</td>
+                        <td>{`${USDollar.format(monthly.qbBalance)}`}</td>
+                        <td>{`${USDollar.format(monthly.difference)}`}</td>
                     </tr>
-                    </thead>
-                    <tbody>
-                        {#each Array.from(nwgBalance.entries()) as [date, balance]}
-                        <tr>
-                            <td>{date}</td>
-                            <td>{balance}</td>
-                        </tr>
-                        {/each}
-                    </tbody>
-                </table>
-                </div>
-            {/if}
-            <div class="divider divider-horizontal"></div>
-            {#if qbCustomers.size > 0}
-            <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 w-1/2">
-                <table class="table">
-                    <caption class="text-l font-bold py-2 px-4 w-full">QB Balances</caption>
-                    <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Balance</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        {#each Array.from(qbBalance.entries()) as [date, balance]}
-                        <tr>
-                            <td>{date}</td>
-                            <td>{balance}</td>
-                        </tr>
-                        {/each}
-                    </tbody>
-                </table>
-                </div>
-            {/if}
-        </div>
-        <div class="modal-action">
-            <button class="btn" onclick={ closeReport }>Close</button>
-        </div>
+                {/each}
+            </tbody>
+        </table>
     </div>
 </dialog>
-
-
 
 {#if qbError}
 <p>Error getting quickbooks events {qbError}</p>

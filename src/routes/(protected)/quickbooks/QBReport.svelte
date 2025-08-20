@@ -98,7 +98,7 @@
         <td>{readableDate(event.date)}</td>
         <td>{event.lineDescription}</td>
         <td>{event.name}</td>
-        <td>{event.amount.toFixed(2)}</td>
+        <td>{event.amount ? event.amount.toFixed(2) : 'N/A'}</td>
       </tr>
       {/each}
     </tbody>

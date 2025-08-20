@@ -102,18 +102,17 @@
       //add name -> invoicer maps.
 
       return name.trim().toLowerCase()
-      .replace(/\s+/g, ' ')
+      .replace(/\s+/g, '')
       .replace (/\(invoice for:\s*/gi, '')
       .replace(/\)/g, '')
       .replace(/\(/g, '')
-      .replace(/-/g, ' ')
+      .replace(/-/g, '')
       .trim()
 
       
     }
 
     function findMatchingEvents() {
-      console.log('hello from find matching events')
       const matches = new Map()
       const nwgOnly = []
       const qbOnly = []
@@ -122,9 +121,9 @@
       const nwgEventsMap = new Map()
       const qbEventsMap = new Map()
 
-      console.log('=== DEBUGGING ===')
-      console.log(nwgEvents.slice(0,3))
-      console.log(qbEvents.slice(0,3))
+      // console.log('=== DEBUGGING ===')
+      // console.log(nwgEvents.slice(0,3))
+      // console.log(qbEvents.slice(0,3))
 
       nwgEvents.forEach((event, index) => {
         const normalizedName = normalizeContractName(event.customerInfo)
@@ -133,7 +132,7 @@
         const key = `${normalizedDate}_${normalizedName}`
 
         if (index < 3){
-          console.log(`NWG ${index}: "${event.customerInfo}" --> ${normalizedName} --> key: "${key}"`)
+          // console.log(`NWG ${index}: "${event.customerInfo}" --> ${normalizedName} --> key: "${key}"`)
         }
 
         if (!nwgEventsMap.has(key)){
@@ -160,7 +159,7 @@
 
 
         if (index < 3){
-          console.log(`QB${index}: "${event.name} or "${event.lineDescription}" --> ${normalizedName} --> "${key}"`)
+          // console.log(`QB${index}: "${event.name} or "${event.lineDescription}" --> ${normalizedName} --> "${key}"`)
         }
 
         if (!qbEventsMap.has(key)){
@@ -186,15 +185,15 @@
             )
 
             if (matchingQbEvent){
-              console.log('match found:',  matchingQbEvent.originalIndex)
-              console.log('NWG event: ', nwgEvent)
-              console.log('original index: ', nwgEvent.originalIndex)
+              // console.log('match found:',  matchingQbEvent.originalIndex)
+              // console.log('NWG event: ', nwgEvent)
+              // console.log('original index: ', nwgEvent.originalIndex)
               matches.set(nwgEvent.originalIndex, matchingQbEvent.originalIndex)
-              console.log(Array.from(matches.entries()))
+              // console.log(Array.from(matches.entries()))
               processedNwgKeys.add(key)
               processedQbKeys.add(key)
             } else {
-              console.log("no matching event found : ", nwgEvent.originalIndex)
+              // console.log("no matching event found : ", nwgEvent.originalIndex)
               const closestQbEvent = qbEventsList[0]
               amountMismatches.push({
                 nwgEvent,
@@ -225,11 +224,11 @@
         }
       }
 
-      console.log('NWG Event Map Keys:', Array.from(nwgEventsMap.keys()).slice(0,5))
-      console.log('Qb Event Map Keys:', Array.from(qbEventsMap.keys()).slice(0,5))
-      console.log('final matches:', matches)
-      console.log('final mismatches: ', amountMismatches)
-      console.log('=== END DEBUG ===')
+      // console.log('NWG Event Map Keys:', Array.from(nwgEventsMap.keys()).slice(0,5))
+      // console.log('Qb Event Map Keys:', Array.from(qbEventsMap.keys()).slice(0,5))
+      // console.log('final matches:', matches)
+      // console.log('final mismatches: ', amountMismatches)
+      // console.log('=== END DEBUG ===')
 
       return {matches, nwgOnly, qbOnly, amountMismatches}
     }
@@ -362,7 +361,7 @@
             <td>{readableDate(qbevent.date)}</td>
             <td>{qbevent.lineDescription}</td>
             <td>{qbevent.name}</td>
-            <td>{qbevent.amount.toFixed(2)}</td>
+            <td>{qbevent.amount ? qbevent.amount.toFixed(2): 'N/A'}</td>
             <td></td>
         </tr>
         {/each}

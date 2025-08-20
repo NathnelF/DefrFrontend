@@ -129,7 +129,15 @@
       console.log('Could not fetch url')
     }
   }
+
+  
+    const USDollar = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    })
+
 </script>
+
 
 <style>
   .sortable-header {
@@ -159,7 +167,6 @@
   <table class="table text-left">
     <thead>
       <tr>
-        <th>Contract Id</th>
         <th class="sortable-header" onclick={() => handleSort('customer')}>
           Customer
           <span class="sort-indicator">{getSortIndicator('customer')}</span>
@@ -187,10 +194,9 @@
     <tbody>
       {#each sortedContracts as contract, i}
       <tr>
-        <th>{contract.id}</th>
         <td>{contract.customerName}</td>
         <td>{contract.serviceName}</td>
-        <td>{`${contract.price.toFixed(2)}`}</td>
+        <td>{`${USDollar.format(contract.price.toFixed(2))}`}</td>
         <td>{readableDate(contract.currentTermStart)}</td>
         <td>{readableDate(contract.currentTermEnd)}</td>
         <td class="text-center">

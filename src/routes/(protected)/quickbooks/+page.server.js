@@ -1,7 +1,10 @@
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+
 import { error } from "@sveltejs/kit";
 
 export const actions = {
     upload: async ( {request, fetch }) => {
+        console.log('upload action started!')
         const data = await request.formData();
 
         const file = data.get("csvFile")
@@ -20,14 +23,14 @@ export const actions = {
                 }
                 console.log(`${csvData.substring(0, 20)}`)
                 const url = "https://localhost:7246/post_qb_events"
-                try{
-                    const res = await fetch(url, {
+                const res = await fetch(url, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({csvContent: csvData})
                     })
+                    console.log('Frontend: response status', res.status)
                     if (!res.ok) {
                         const errorText = await res.text()
                         console.log(`error: ${errorText}`)
@@ -43,18 +46,11 @@ export const actions = {
                         error: null,
                         result: result
                     }
-                } catch (error) {
-                    console.log(`error on backend ${error.message}`)
-                    return {
-                        success: false,
-                        error: `Error on backend ${error.message}`,
-                        result: null
-                    }
-                }
 
 
             } catch (error) {
-                console.log(`error on csv content ${error.message}`)
+                console.log(`error on backend call ${error.message}`)
+                console.log('full error: ', error)
                 return {
                     success: false,
                     error: error.message,

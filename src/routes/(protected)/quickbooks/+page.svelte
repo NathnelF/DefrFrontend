@@ -28,6 +28,7 @@
             console.log(`Error on request: ${loadError}`)
         }
         else {
+            console.log('found events')
             events = await res.json()
             found = true
         }
@@ -55,7 +56,8 @@
     async function resetAllEvents(){
      try{
         const res = await fetch("https://localhost:7246/clear_qb_events", {
-            method: 'DELETE'
+            method: 'DELETE',
+            credentials: 'include'
         })
         if (!res.ok) {
             clearError = await res.text()
